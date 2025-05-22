@@ -177,7 +177,7 @@
       let allRecipes = [];
 
       async function loadRecipes() {
-        const res = await fetch("http://localhost:5000/api/recipes");
+        const res = await fetch("https://tastynet.onrender.com/api/recipes");
         allRecipes = await res.json();
         renderRecipes("All");
       }
