@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Food Recipe App</title>
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Nunito', sans-serif;
+  }
+  h1, h2, h3, .category {
+    font-family: 'Poppins', sans-serif;
+  }
+</style>
+
+    <style>
+      .fade-enter {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      .fade-enter-active {
+        opacity: 1;
+        transform: scale(1);
+        transition: all 0.3s ease-in-out;
+      }
+      .fade-exit {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .fade-exit-active {
+        opacity: 0;
+        transform: scale(0.95);
+        transition: all 0.3s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-gray-900 font-sans">
+
+    <!-- Header -->
+    <header class="p-6 bg-white rounded-b-3xl">
+      <h1 class="text-2xl font-bold text-yellow-500 tracking-wide">Tasty Net</h1>
+      <p class="text-sm text-gray-600 mt-1">
+        Hungry? Make your own food, <span class="text-yellow-500 font-semibold">stay at home</span>
+      </p>
+    </header>
+    
+
+    <!-- Search Bar -->
+    <div class="px-5 mb-5 ">
+      <div class="flex items-center bg-gray-100 rounded-full px-4 py-2">
+        <input
+          type="text"
+          id="searchInput"
+          onkeyup="filterRecipes()"
+          placeholder="Search any recipe"
+          class="bg-transparent outline-none flex-grow text-sm"
+        />
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/>
+        </svg>
+      </div>
+    </div>
+    
+
+    <!-- Category Tabs -->
+    <div class="px-5 mb-6">
+      <div id="tabs" class="flex space-x-3 overflow-auto">
+        <button data-cat="All" class="tab-btn bg-yellow-400 text-white px-4 py-2 rounded-full text-sm font-medium">All</button>
+        <button data-cat="Western" class="tab-btn bg-gray-100 px-4 py-2 rounded-full text-sm font-medium">Western</button>
+        <button data-cat="Drinks" class="tab-btn bg-gray-100 px-4 py-2 rounded-full text-sm font-medium">Drinks</button>
+        <button data-cat="Local" class="tab-btn bg-gray-100 px-4 py-2 rounded-full text-sm font-medium">Local</button>
+        <button data-cat="Dessert" class="tab-btn bg-gray-100 px-4 py-2 rounded-full text-sm font-medium">Dessert</button>
+      </div>
+    </div>
+    <div id="recipeDetail" class="fixed inset-0 bg-white z-50 hidden flex-col overflow-auto">
+        <button onclick="closeDetail()" class="absolute top-4 left-4 z-10 bg-white p-2 rounded-full shadow-md">
+          <i class="fas fa-arrow-left text-yellow-500 text-xl"></i>
+        </button>
+      
+        <img id="detailImg" class="w-full h-60 object-cover rounded-b-3xl mb-4" />
+      
+        <div class="px-4 pb-6">
+          <h2 id="detailTitle" class="text-2xl font-bold mb-1"></h2>
+          <p id="detailCategory" class="text-gray-500 text-sm mb-4"></p>
+      
+          <div class="grid grid-cols-3 gap-4 mb-6 text-center">
+            <div class="bg-yellow-400 p-3 rounded-2xl shadow-md">
+              <i class="fas fa-stopwatch text-yellow-600 text-lg mb-1"></i>
+              <p id="detailPrepTime" class="text-sm font-semibold"></p>
+            </div>
+            <div class="bg-red-100 p-3 rounded-2xl shadow-md">
+              <i class="fas fa-fire-alt text-red-600 text-lg mb-1"></i>
+              <p id="detailCalories" class="text-sm font-semibold"></p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-2xl shadow-md">
+              <i class="fas fa-signal text-blue-600 text-lg mb-1"></i>
+              <p id="detailDifficulty" class="text-sm font-semibold"></p>
+            </div>
+          </div>
+      
+          <h3 class="text-lg font-semibold mb-2">Ingredients</h3>
+          <ul id="detailIngredients" class="list-disc pl-5 space-y-1 text-sm text-gray-700"></ul>
+        </div>
+      </div>
+      
+    <!-- HOME TAB -->
+    <section id="homeTab" class="px-5 pt-4">
+      <h2 class="text-lg font-semibold mb-4">Popular Recipes</h2>
+      <div id="recipeList" class="grid gap-5"></div>
+    </section>
+
+    <!-- Detail View Modal -->
+    <div id="recipeDetail" class="fixed inset-0 bg-white z-50 p-5 hidden flex-col overflow-auto">
+      <button onclick="closeDetail()" class="self-end text-xl font-bold">×</button>
+      <img id="detailImg" class="w-full h-64 object-cover rounded-xl mb-4" />
+      <h2 id="detailTitle" class="text-2xl font-semibold mb-2"></h2>
+      <p id="detailCategory" class="text-gray-500 mb-2"></p>
+      <p id="detailPrep" class="text-gray-600 mb-1"></p>
+      <p id="detailCalories" class="text-gray-600 mb-1"></p>
+      <h3 class="text-lg font-semibold mt-4 mb-2">Ingredients</h3>
+      <ul id="detailIngredients" class="list-disc pl-5 text-sm text-gray-700"></ul>
+    </div>
+
+    <!-- ADD TAB -->
+    <section id="addTab" class="hidden px-5 pt-5 pb-20">
+      <h2 class="text-xl font-semibold mb-4">Post New Recipe</h2>
+      <form id="addRecipeForm" enctype="multipart/form-data" class="space-y-4">
+        <input type="text" name="title" placeholder="Recipe Title" required class="w-full px-4 py-2 border rounded-lg" />
+        <select name="category" required class="w-full px-4 py-2 border rounded-lg">
+          <option value="" disabled selected>Select Category</option>
+          <option value="Western">Western</option>
+          <option value="Drinks">Drinks</option>
+          <option value="Local">Local</option>
+          <option value="Dessert">Dessert</option>
+        </select>
+        <input type="number" name="prepTime" placeholder="Prep Time (mins)" required class="w-full px-4 py-2 border rounded-lg" />
+        <input type="number" name="calories" placeholder="Calories" required class="w-full px-4 py-2 border rounded-lg" />
+        <select name="difficulty" required class="w-full px-4 py-2 border rounded-lg">
+          <option value="" disabled selected>Difficulty</option>
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+        <textarea name="ingredients" placeholder="Ingredients (comma-separated)" required class="w-full px-4 py-2 border rounded-lg"></textarea>
+        <input type="file" name="image" accept="image/*" required class="w-full border px-4 py-2 rounded-lg" />
+        <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg transition duration-200">
+          Post Recipe
+        </button>
+      </form>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-md p-3 flex justify-around items-center">
+      <button class="tab-item flex flex-col items-center text-yellow-500" data-tab="home">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M4 6h16M5 14h14M6 18h12" />
+        </svg>
+        <span class="text-xs">Home</span>
+      </button>
+      <button class="tab-item flex flex-col items-center text-gray-400" data-tab="add">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="text-xs">Add</span>
+      </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script>
+      let allRecipes = [];
+
+      async function loadRecipes() {
+        const res = await fetch("http://localhost:5000/api/recipes");
+        allRecipes = await res.json();
+        renderRecipes("All");
+      }
+
+      function renderRecipes(category) {
+        const list = document.getElementById("recipeList");
+        const filtered = category === "All" ? allRecipes : allRecipes.filter(r => r.category === category);
+      
+        if (!filtered.length) {
+          list.innerHTML = "<p>No recipes found.</p>";
+          return;
+        }
+      
+        list.innerHTML = filtered.map(r => `
+          <div class="recipe-card cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden" data-id="${r._id}">
+            <img src="${r.imageUrl}" alt="${r.title}" class="w-full h-48 object-cover" />
+            <div class="p-4">
+              <h3 class="text-md font-semibold mb-1">${r.title}</h3>
+              <p class="text-sm text-gray-500 mb-1">${r.category} • ${r.difficulty}</p>
+              <div class="text-sm flex justify-between text-gray-600">
+                <span>⏱ ${r.prepTime} min</span>
+                <span>🔥 ${r.calories} cal</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      
+        // Attach click event listeners after rendering
+        document.querySelectorAll(".recipe-card").forEach(card => {
+          card.addEventListener("click", () => {
+            const recipe = allRecipes.find(r => r._id === card.dataset.id);
+            if (recipe) openDetail(recipe);
+          });
+        });
+      }
+      
+      function openDetail(data) {
+        document.getElementById("recipeDetail").classList.remove("hidden");
+        document.getElementById("detailImg").src = data.imageUrl;
+        document.getElementById("detailTitle").textContent = data.title;
+        document.getElementById("detailCategory").textContent = data.category;
+        document.getElementById("detailPrepTime").textContent = `${data.prepTime} min`;
+        document.getElementById("detailCalories").textContent = `${data.calories} cal`;
+        document.getElementById("detailDifficulty").textContent = data.difficulty;
+      
+        const ul = document.getElementById("detailIngredients");
+        ul.innerHTML = '';
+        data.ingredients.forEach(ingredient => {
+          const li = document.createElement("li");
+          li.textContent = ingredient;
+          ul.appendChild(li);
+        });
+      }
+      
+      function closeDetail() {
+        document.getElementById("recipeDetail").classList.add("hidden");
+      }
+      
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(b => {
+              b.classList.remove("bg-yellow-400", "text-white");
+              b.classList.add("bg-gray-100", "text-gray-700");
+            });
+            btn.classList.remove("bg-gray-100", "text-gray-700");
+            btn.classList.add("bg-yellow-400", "text-white");
+            renderRecipes(btn.getAttribute("data-cat"));
+          });
+        });
+
+        document.querySelectorAll(".tab-item").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-item").forEach(tab => {
+              tab.classList.remove("text-yellow-500");
+              tab.classList.add("text-gray-400");
+            });
+            btn.classList.remove("text-gray-400");
+            btn.classList.add("text-yellow-500");
+            if (btn.dataset.tab === "home") {
+              document.getElementById("homeTab").classList.remove("hidden");
+              document.getElementById("addTab").classList.add("hidden");
+              loadRecipes();
+            } else {
+              document.getElementById("homeTab").classList.add("hidden");
+              document.getElementById("addTab").classList.remove("hidden");
+            }
+          });
+        });
+      });
+
+      const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+
+      document.getElementById("addRecipeForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const imageBase64 = await toBase64(formData.get("image"));
+        const ingredients = formData.get("ingredients").split(",").map(i => i.trim()).filter(Boolean);
+        const payload = {
+          title: formData.get("title"),
+          category: formData.get("category"),
+          prepTime: formData.get("prepTime"),
+          calories: formData.get("calories"),
+          difficulty: formData.get("difficulty"),
+          ingredients,
+          image: imageBase64
+        };
+        try {
+          const res = await fetch("http://localhost:5000/api/recipes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error("Failed to post recipe");
+          alert("✅ Recipe posted successfully!");
+          e.target.reset();
+          document.querySelector('[data-tab="home"]').click();
+        } catch (err) {
+          console.error(err);
+          alert("Error: " + err.message);
+        }
+      });
+
+      loadRecipes();
+      function filterRecipes() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const recipeCards = document.querySelectorAll("#recipeList .recipe-card"); // update selector as needed
+      
+        recipeCards.forEach(card => {
+          const title = card.querySelector("h3").textContent.toLowerCase();
+          if (title.includes(input)) {
+            card.style.display = "block";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+      
+    </script>
+  </body>
+</html>
